@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | Rent Tracking{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-cash-stack text-primary me-2"></i>Rent Tracking
+            </h2>
+            <p class="text-muted small mb-0">Track monthly rent statements and due dates across your active tenancies.</p>
+        </div>
+        <a href="{% url 'accounts:owner_dashboard' %}" class="btn btn-outline-primary px-3">
+            <i class="bi bi-speedometer2 me-1"></i> Owner Dashboard
+        </a>
+    </div>
+
+    {% if rent_records %}
+        <div class="card sr-card shadow-sm border-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase small text-muted">
+                        <tr>
+                            <th class="py-3 px-4">Tenant</th>
+                            <th class="py-3 px-3">Property</th>
+                            <th class="py-3 px-3">Rent Month</th>
+                            <th class="py-3 px-3">Amount</th>
+                            <th class="py-3 px-3">Due Date</th>
+                            <th class="py-3 px-3">Status</th>
+                            <th class="py-3 px-4 text-end">Payment Details / Txn ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in rent_records %}
+                            <tr>
+                                <td class="py-3 px-4">
+                                    <strong class="text-dark d-block">{{ record.tenancy.tenant.get_full_name|default:record.tenancy.tenant.username }}</strong>
+                                    <small class="text-muted">{{ record.tenancy.tenant.email }}</small>
+                                </td>
+                                <td class="py-3 px-3 small text-dark fw-semibold">
+                                    {{ record.tenancy.property.title }}
+                                </td>
+                                <td class="py-3 px-3 fw-semibold text-dark">
+                                    {{ record.rent_month|date:"F Y" }}
+                                </td>
+                                <td class="py-3 px-3 fw-bold text-success">
+                                    ₹{{ record.amount|floatformat:0 }}
+                                </td>
+                                <td class="py-3 px-3 small text-dark">
+                                    {{ record.due_date|date:"d M Y" }}
+                                </td>
+                                <td class="py-3 px-3">
+                                    {% with status=record.get_computed_status %}
+                                        {% if status == 'UPCOMING' %}
+                                            <span class="badge bg-warning text-dark px-2.5 py-1">
+                                                <i class="bi bi-clock me-1"></i> Upcoming
+                                            </span>
+                                        {% elif status == 'DUE' %}
+                                            <span class="badge bg-primary text-white px-2.5 py-1">
+                                                <i class="bi bi-exclamation-circle me-1"></i> Due Today
+                                            </span>
+                                        {% elif status == 'PAID' %}
+                                            <span class="badge bg-success text-white px-2.5 py-1">
+                                                <i class="bi bi-check-circle me-1"></i> Paid
+                                            </span>
+                                        {% elif status == 'OVERDUE' %}
+                                            <span class="badge bg-danger text-white px-2.5 py-1">
+                                                <i class="bi bi-exclamation-triangle me-1"></i> Overdue
+                                            </span>
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    {% if record.payment %}
+                                        <div class="small fw-semibold text-dark mb-0.5">
+                                            {{ record.payment.get_payment_method_display }} &bull; {{ record.payment.paid_at|date:"d M Y" }}
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-end gap-2 mt-1">
+                                            <code class="text-primary extra-small fw-bold">{{ record.payment.transaction_id }}</code>
+                                            <a href="{% url 'core:view_receipt' record.payment.pk %}" class="btn btn-outline-primary btn-sm py-0.5 px-2 extra-small fw-semibold">
+                                                <i class="bi bi-file-earmark-text me-1"></i> Receipt
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted small italic">Pending Payment</span>
+                                    {% endif %}
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="card sr-card p-5 text-center bg-white shadow-sm border-0">
+            <div class="py-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-light text-secondary p-3 rounded-circle mb-3">
+                    <i class="bi bi-cash-stack fs-1 text-muted"></i>
+                </div>
+                <h4 class="fw-bold text-dark">No rent records found</h4>
+                <p class="text-muted small max-w-500 mx-auto mb-4">
+                    Monthly rent records for your active tenants will automatically appear here.
+                </p>
+                <a href="{% url 'core:active_tenants' %}" class="btn sr-btn-primary px-4 fw-semibold">
+                    <i class="bi bi-people me-1"></i> Manage Active Tenants
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

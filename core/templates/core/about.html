@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | About & SDG Mission{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark">About SafeRent</h2>
+        <p class="text-muted">Smart Rental Property &amp; Tenant Management Platform designed for safety, transparency, and convenience.</p>
+    </div>
+</div>
+
+<!-- Platform Mission -->
+<div class="card sr-card p-4 mb-4">
+    <h4 class="fw-bold text-dark mb-3"><i class="bi bi-shield-check text-success me-2"></i>Our Mission</h4>
+    <p class="text-secondary lh-lg mb-0">
+        SafeRent is built to revolutionize rental property management by bridging the gap between tenants and property owners. From initial property discovery and digital lease agreements to monthly rent tracking, utility bill management, and maintenance request workflows — SafeRent provides a single, unified digital hub.
+    </p>
+</div>
+
+<!-- SDG Alignment Section -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card sr-card p-4 h-100 border-start border-4 border-success">
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success me-3">
+                    <i class="bi bi-buildings fs-3"></i>
+                </div>
+                <div>
+                    <span class="badge bg-success bg-opacity-10 text-success fw-bold">Primary Goal</span>
+                    <h5 class="fw-bold mb-0">SDG 11 – Sustainable Cities</h5>
+                </div>
+            </div>
+            <p class="text-muted small mb-0 lh-lg">
+                Promoting sustainable, inclusive, and accessible rental housing options in urban communities. SafeRent empowers tenants to easily find safe housing with transparent pricing and verified property details.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card sr-card p-4 h-100 border-start border-4 border-info">
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-info bg-opacity-10 p-3 rounded-3 text-info me-3">
+                    <i class="bi bi-bank fs-3"></i>
+                </div>
+                <div>
+                    <span class="badge bg-info bg-opacity-10 text-info fw-bold">Supporting Goal</span>
+                    <h5 class="fw-bold mb-0">SDG 16 – Peace &amp; Strong Institutions</h5>
+                </div>
+            </div>
+            <p class="text-muted small mb-0 lh-lg">
+                Building trust and transparency between property owners and tenants through clear rental contracts, recorded payment histories, structured maintenance reporting, and fair security deposit settlements.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

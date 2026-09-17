@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'core:properties' %}" class="text-decoration-none">Properties</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ property.title|truncatechars:30 }}</li>
+        </ol>
+    </nav>
+
+    <!-- Property Header -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">{{ property.title }}</h2>
+            <p class="text-muted small mb-0">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ property.location }} &bull; {{ property.address }}
+            </p>
+        </div>
+        <div>
+            {% if property.is_available %}
+                <span class="badge bg-success text-white px-3 py-2 fs-6 shadow-sm">
+                    <i class="bi bi-check-circle me-1"></i> Available for Rent
+                </span>
+            {% else %}
+                <span class="badge bg-secondary text-white px-3 py-2 fs-6 shadow-sm">
+                    <i class="bi bi-x-circle me-1"></i> Currently Rented / Unavailable
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Column: Photo Carousel & Property Description -->
+        <div class="col-lg-8">
+            <!-- Photo Gallery / Carousel -->
+            <div class="card sr-card shadow-sm border-0 mb-4 overflow-hidden">
+                {% if property.images.all %}
+                    <div id="publicPropertyCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner bg-dark" style="max-height: 420px;">
+                            {% for img in property.images.all %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %} text-center">
+                                    <img src="{{ img.image.url }}" class="d-block w-100 object-fit-cover" style="max-height: 420px;" alt="{{ property.title }}">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if property.images.count > 1 %}
+                            <button class="carousel-control-prev" type="button" data-bs-target="#publicPropertyCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#publicPropertyCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="bg-light text-center py-5">
+                        <i class="bi bi-building fs-1 text-muted opacity-50 mb-2 d-block"></i>
+                        <span class="text-muted small">No photos available for this property listing.</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Property Description Card -->
+            <div class="card sr-card shadow-sm border-0 p-4 mb-4">
+                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Property Overview &amp; Description</h5>
+                <p class="text-secondary lh-base mb-0" style="white-space: pre-line;">{{ property.description }}</p>
+            </div>
+
+            <!-- Amenities & Facilities Card -->
+            <div class="card sr-card shadow-sm border-0 p-4">
+                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Amenities &amp; Features</h5>
+                <div class="row g-3">
+                    <div class="col-6 col-md-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-wifi fs-4 {% if property.wifi_available %}text-success{% else %}text-muted opacity-50{% endif %}"></i>
+                            <div>
+                                <span class="d-block small text-muted">Wi-Fi</span>
+                                <span class="fw-semibold small">{% if property.wifi_available %}Available{% else %}Not Available{% endif %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-p-circle fs-4 {% if property.parking_available %}text-success{% else %}text-muted opacity-50{% endif %}"></i>
+                            <div>
+                                <span class="d-block small text-muted">Parking</span>
+                                <span class="fw-semibold small">{% if property.parking_available %}Available{% else %}Not Available{% endif %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-lamp fs-4 text-primary"></i>
+                            <div>
+                                <span class="d-block small text-muted">Furnishing</span>
+                                <span class="fw-semibold small">{{ property.get_furnished_status_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if property.other_amenities %}
+                    <div class="mt-4 pt-3 border-top">
+                        <span class="fw-semibold text-dark small d-block mb-1">Additional Facilities:</span>
+                        <p class="text-muted small mb-0">{{ property.other_amenities }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column: Specs, Rent & Owner Info Sidebar -->
+        <div class="col-lg-4">
+            <!-- Pricing & Specs Card -->
+            <div class="card sr-card shadow-sm border-0 p-4 mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="badge bg-dark bg-opacity-75 text-white px-3 py-1">
+                        {{ property.get_property_type_display }}
+                    </span>
+                    <span class="badge bg-light text-dark border px-2 py-1 small">
+                        ID #{{ property.pk }}
+                    </span>
+                </div>
+
+                <!-- Rent Display -->
+                <div class="bg-light p-3 rounded-3 mb-4 text-center">
+                    <span class="text-muted small d-block mb-1">Monthly Rent</span>
+                    <h2 class="fw-bold text-success mb-0">₹{{ property.monthly_rent }}</h2>
+                    <small class="text-muted">Security Deposit: ₹{{ property.security_deposit }}</small>
+                </div>
+
+                <!-- Specs List -->
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted"><i class="bi bi-door-closed me-2 text-primary"></i>Bedrooms</span>
+                        <span class="fw-bold text-dark">{{ property.bedrooms }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted"><i class="bi bi-droplet me-2 text-primary"></i>Bathrooms</span>
+                        <span class="fw-bold text-dark">{{ property.bathrooms }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted"><i class="bi bi-lamp me-2 text-primary"></i>Furnishing</span>
+                        <span class="fw-bold text-dark">{{ property.get_furnished_status_display }}</span>
+                    </li>
+                </ul>
+
+                <!-- Request to Rent Action -->
+                {% if property.is_available %}
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'TENANT' or user.is_superuser %}
+                            <a href="{% url 'core:request_rental' property.pk %}" class="btn sr-btn-primary w-100 fw-semibold btn-lg shadow-sm">
+                                <i class="bi bi-send-fill me-1"></i> Request to Rent
+                            </a>
+                        {% else %}
+                            <div class="alert alert-light border text-center text-muted small mb-0 py-2">
+                                <i class="bi bi-building-gear me-1"></i> Property Owner Account (Cannot Request Rental)
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?next={% url 'core:request_rental' property.pk %}" class="btn sr-btn-primary w-100 fw-semibold btn-lg shadow-sm">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Request to Rent (Login Required)
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <button class="btn btn-secondary w-100 fw-semibold btn-lg" disabled>
+                        Currently Unavailable
+                    </button>
+                {% endif %}
+            </div>
+
+
+            <!-- Owner Information Card (Safe Public Data) -->
+            <div class="card sr-card shadow-sm border-0 p-4">
+                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                    <i class="bi bi-person-badge text-primary me-2"></i>Property Owner Info
+                </h5>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle">
+                        <i class="bi bi-person-fill fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">
+                            {{ property.owner.first_name }} {{ property.owner.last_name }}
+                        </h6>
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary small">Verified Property Owner</span>
+                    </div>
+                </div>
+
+                <ul class="list-unstyled small mb-0">
+                    <li class="mb-2 text-muted">
+                        <i class="bi bi-envelope me-2 text-primary"></i>
+                        <span>{{ property.owner.email }}</span>
+                    </li>
+                    {% if property.owner.phone_number %}
+                        <li class="mb-2 text-muted">
+                            <i class="bi bi-telephone me-2 text-primary"></i>
+                            <span>{{ property.owner.phone_number }}</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

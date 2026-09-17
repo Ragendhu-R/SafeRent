@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | Pay Rent (Demo Payment){% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <!-- Academic Demo Notice Banner -->
+            <div class="alert alert-info d-flex align-items-center gap-2 mb-4 py-2.5 px-3 small rounded-3 shadow-sm border-0">
+                <i class="bi bi-info-circle-fill fs-5 text-info flex-shrink-0"></i>
+                <div>
+                    <strong>Academic Project Demo:</strong> This is a simulated payment gateway. No real bank accounts, cards, or money are used.
+                </div>
+            </div>
+
+            <div class="card sr-card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3 px-4">
+                    <h3 class="fw-bold text-dark mb-1">
+                        <i class="bi bi-credit-card text-success me-2"></i>Pay Rent
+                    </h3>
+                    <p class="text-muted small mb-0">Confirm simulated rent payment for <strong>{{ rent_record.tenancy.property.title }}</strong></p>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Rent Record Summary -->
+                    <div class="bg-light p-3.5 rounded-3 mb-4 border">
+                        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                            <h6 class="fw-bold text-dark mb-0">{{ rent_record.tenancy.property.title }}</h6>
+                            {% with status=rent_record.get_computed_status %}
+                                {% if status == 'UPCOMING' %}
+                                    <span class="badge bg-warning text-dark px-2.5 py-1">Upcoming</span>
+                                {% elif status == 'DUE' %}
+                                    <span class="badge bg-primary text-white px-2.5 py-1">Due Today</span>
+                                {% elif status == 'OVERDUE' %}
+                                    <span class="badge bg-danger text-white px-2.5 py-1">Overdue</span>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+
+                        <div class="row g-3 small">
+                            <div class="col-6">
+                                <span class="text-muted d-block">Rent Month:</span>
+                                <strong class="text-dark">{{ rent_record.rent_month|date:"F Y" }}</strong>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted d-block">Due Date:</span>
+                                <strong class="text-dark">{{ rent_record.due_date|date:"d F Y" }}</strong>
+                            </div>
+                            <div class="col-6 mt-2">
+                                <span class="text-muted d-block">Landlord:</span>
+                                <span class="text-dark fw-semibold">{{ rent_record.tenancy.owner.get_full_name|default:rent_record.tenancy.owner.username }}</span>
+                            </div>
+                            <div class="col-6 mt-2">
+                                <span class="text-muted d-block">Location:</span>
+                                <span class="text-dark fw-semibold">{{ rent_record.tenancy.property.location }}</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-top d-flex align-items-center justify-content-between">
+                            <span class="fw-bold text-dark fs-6">Total Amount Payable:</span>
+                            <span class="fw-bold text-success fs-4">₹{{ rent_record.amount|floatformat:0 }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Selection Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <h6 class="fw-bold text-dark mb-3">
+                            <i class="bi bi-wallet2 me-1"></i> Select Simulated Payment Method
+                        </h6>
+
+                        <div class="row g-3 mb-4">
+                            {% for method_code, method_name in payment_methods %}
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="payment_method" id="method_{{ method_code }}" value="{{ method_code }}" {% if forloop.first %}checked{% endif %}>
+                                    <label class="btn btn-outline-success w-100 p-3 text-start d-flex flex-column h-100 rounded-3 shadow-none" for="method_{{ method_code }}">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            {% if method_code == 'UPI' %}
+                                                <i class="bi bi-qr-code-scan fs-3 text-success"></i>
+                                            {% elif method_code == 'CARD' %}
+                                                <i class="bi bi-credit-card-2-front fs-3 text-primary"></i>
+                                            {% else %}
+                                                <i class="bi bi-bank fs-3 text-info"></i>
+                                            {% endif %}
+                                            <i class="bi bi-check-circle-fill text-success fs-5 check-icon"></i>
+                                        </div>
+                                        <strong class="text-dark d-block mt-auto">{{ method_name }}</strong>
+                                        <small class="text-muted extra-small">Simulated</small>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-end gap-3 pt-2 border-top">
+                            <a href="{% url 'core:tenant_rent_history' %}" class="btn btn-outline-secondary px-4">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success px-4 py-2 fw-semibold">
+                                <i class="bi bi-shield-check me-1"></i> Confirm Demo Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

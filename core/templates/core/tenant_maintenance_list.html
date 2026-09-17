@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | My Maintenance Requests{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header & Actions -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:tenant_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Maintenance Requests</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="bi bi-tools text-success me-2"></i>My Maintenance Requests
+            </h2>
+            <p class="text-muted small mb-0">Track reported plumbing, electrical, or property repair requests.</p>
+        </div>
+        <a href="{% url 'core:report_maintenance' %}" class="btn sr-btn-primary px-3 shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Report New Problem
+        </a>
+    </div>
+
+    {% if maintenance_requests %}
+        <div class="card sr-card shadow-sm border-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase small text-muted border-bottom">
+                        <tr>
+                            <th class="py-3 ps-4">Problem</th>
+                            <th class="py-3">Property</th>
+                            <th class="py-3">Category</th>
+                            <th class="py-3">Priority</th>
+                            <th class="py-3">Submitted</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3 text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in maintenance_requests %}
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <a href="{% url 'core:tenant_maintenance_detail' req.pk %}" class="fw-bold text-dark text-decoration-none hover-primary">
+                                        {{ req.title }}
+                                    </a>
+                                    {% if req.photo %}
+                                        <span class="badge bg-light text-secondary ms-1 small"><i class="bi bi-paperclip me-1"></i>Photo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-dark small fw-semibold">
+                                    {{ req.tenancy.property.title }}
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-pill">
+                                        {{ req.get_category_display }}
+                                    </span>
+                                </td>
+                                <td class="py-3">
+                                    {% if req.priority == 'HIGH' %}
+                                        <span class="badge bg-danger bg-opacity-10 text-danger fw-bold px-2.5 py-1.5 rounded-pill">
+                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>High
+                                        </span>
+                                    {% elif req.priority == 'MEDIUM' %}
+                                        <span class="badge bg-warning bg-opacity-10 text-warning fw-bold px-2.5 py-1.5 rounded-pill">
+                                            <i class="bi bi-dash-circle me-1"></i>Medium
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold px-2.5 py-1.5 rounded-pill">
+                                            <i class="bi bi-arrow-down-circle me-1"></i>Low
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-muted small">
+                                    {{ req.submitted_at|date:"M d, Y" }}
+                                </td>
+                                <td class="py-3">
+                                    {% if req.status == 'PENDING' %}
+                                        <span class="badge bg-warning text-dark px-2.5 py-1.5 rounded-pill">
+                                            <i class="bi bi-hourglass-split me-1"></i>Pending
+                                        </span>
+                                    {% elif req.status == 'ACCEPTED' %}
+                                        <span class="badge bg-info text-white px-2.5 py-1.5 rounded-pill">
+                                            <i class="bi bi-check-circle me-1"></i>Accepted
+                                        </span>
+                                    {% elif req.status == 'IN_PROGRESS' %}
+                                        <span class="badge bg-primary text-white px-2.5 py-1.5 rounded-pill">
+                                            <i class="bi bi-gear-wide-connected me-1"></i>In Progress
+                                        </span>
+                                    {% elif req.status == 'COMPLETED' %}
+                                        <span class="badge bg-success text-white px-2.5 py-1.5 rounded-pill">
+                                            <i class="bi bi-check-all me-1"></i>Completed
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-end pe-4">
+                                    <a href="{% url 'core:tenant_maintenance_detail' req.pk %}" class="btn btn-outline-success btn-sm px-3">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="card sr-card p-5 text-center bg-white shadow-sm border-0">
+            <div class="py-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-light text-secondary p-3.5 rounded-circle mb-3">
+                    <i class="bi bi-tools fs-1 text-success"></i>
+                </div>
+                <h4 class="fw-bold text-dark">No maintenance requests yet.</h4>
+                <p class="text-muted small max-w-500 mx-auto mb-4">
+                    If you experience any plumbing, electrical, appliance, or property maintenance issues, submit a request here to notify your landlord.
+                </p>
+                <a href="{% url 'core:report_maintenance' %}" class="btn sr-btn-primary px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Report Maintenance Problem
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | My Utility Bills{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header & Breadcrumbs -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:tenant_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Utility Bills</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="bi bi-receipt text-success me-2"></i>My Utility Bills
+            </h2>
+            <p class="text-muted small mb-0">View monthly utility charge breakdowns added by your property landlord.</p>
+        </div>
+        <a href="{% url 'accounts:tenant_dashboard' %}" class="btn btn-outline-secondary btn-sm px-3">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    {% if active_tenancy %}
+        <div class="card sr-card p-3 mb-4 bg-light border-0 shadow-sm">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                    <span class="badge bg-success text-white px-2.5 py-1 rounded-pill small mb-1">Active Rental</span>
+                    <h5 class="fw-bold text-dark mb-0">{{ active_tenancy.property.title }}</h5>
+                    <p class="text-muted small mb-0"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ active_tenancy.property.address }}, {{ active_tenancy.property.location }}</p>
+                </div>
+                <div>
+                    <span class="small text-muted d-block">Landlord</span>
+                    <strong class="text-dark">{{ active_tenancy.owner.get_full_name|default:active_tenancy.owner.username }}</strong>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if utility_bills %}
+        <!-- Utility Bills List -->
+        <div class="row g-4 mb-4">
+            {% for bill in utility_bills %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card sr-card h-100 shadow-sm border-0 border-top border-4 border-success">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                <span class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-1.5 rounded-pill fs-6">
+                                    <i class="bi bi-calendar-event me-1"></i>{{ bill.billing_month|date:"F Y" }}
+                                </span>
+                                <small class="text-muted extra-small">{{ bill.created_at|date:"M d, Y" }}</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between py-1.5 border-bottom border-light">
+                                    <span class="text-muted"><i class="bi bi-lightning-charge text-warning me-1.5"></i>Electricity:</span>
+                                    <strong class="text-dark">₹{{ bill.electricity_charge|floatformat:0 }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between py-1.5 border-bottom border-light">
+                                    <span class="text-muted"><i class="bi bi-droplet text-primary me-1.5"></i>Water:</span>
+                                    <strong class="text-dark">₹{{ bill.water_charge|floatformat:0 }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between py-1.5 border-bottom border-light">
+                                    <span class="text-muted"><i class="bi bi-wrench-adjustable text-secondary me-1.5"></i>Maintenance:</span>
+                                    <strong class="text-dark">₹{{ bill.maintenance_charge|floatformat:0 }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between py-1.5 border-bottom border-light">
+                                    <span class="text-muted"><i class="bi bi-three-dots me-1.5"></i>Other:</span>
+                                    <strong class="text-dark">₹{{ bill.other_charge|floatformat:0 }}</strong>
+                                </div>
+                            </div>
+
+                            {% if bill.note %}
+                                <div class="bg-light p-2.5 rounded-3 mb-3 small">
+                                    <span class="fw-semibold text-dark d-block mb-0.5"><i class="bi bi-info-circle me-1"></i>Note:</span>
+                                    <span class="text-muted">{{ bill.note }}</span>
+                                </div>
+                            {% endif %}
+
+                            <div class="bg-success bg-opacity-10 p-3 rounded-3 text-center">
+                                <small class="text-muted d-block text-uppercase fw-bold extra-small mb-0.5">Total Utilities</small>
+                                <h4 class="fw-bold text-success mb-0">₹{{ bill.total_utility_charges|floatformat:0 }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Table View format matching prompt format -->
+        <div class="card sr-card shadow-sm border-0 overflow-hidden mt-4">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h6 class="fw-bold text-dark mb-0"><i class="bi bi-table me-2 text-success"></i>Utility Statement Breakdown</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase small text-muted border-bottom">
+                        <tr>
+                            <th class="py-3 ps-4">Month</th>
+                            <th class="py-3 text-end">Electricity</th>
+                            <th class="py-3 text-end">Water</th>
+                            <th class="py-3 text-end">Maintenance</th>
+                            <th class="py-3 text-end">Other</th>
+                            <th class="py-3 text-end pe-4">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in utility_bills %}
+                            <tr>
+                                <td class="ps-4 py-3 fw-bold text-dark">{{ bill.billing_month|date:"F Y" }}</td>
+                                <td class="py-3 text-end">₹{{ bill.electricity_charge|floatformat:0 }}</td>
+                                <td class="py-3 text-end">₹{{ bill.water_charge|floatformat:0 }}</td>
+                                <td class="py-3 text-end">₹{{ bill.maintenance_charge|floatformat:0 }}</td>
+                                <td class="py-3 text-end">₹{{ bill.other_charge|floatformat:0 }}</td>
+                                <td class="py-3 text-end pe-4 fw-bold text-success fs-6">₹{{ bill.total_utility_charges|floatformat:0 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="card sr-card p-5 text-center bg-white shadow-sm border-0">
+            <div class="py-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-light text-secondary p-3.5 rounded-circle mb-3">
+                    <i class="bi bi-receipt fs-1 text-success"></i>
+                </div>
+                <h4 class="fw-bold text-dark">No utility bills recorded yet.</h4>
+                <p class="text-muted small max-w-500 mx-auto mb-0">
+                    When your landlord records monthly utility bills (electricity, water, maintenance), your detailed statement will appear here.
+                </p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

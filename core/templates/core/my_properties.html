@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | My Properties{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header with Action Button -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-building text-success-accent me-2"></i>My Listed Properties
+            </h2>
+            <p class="text-muted small mb-0">Manage all your active and unlisted rental properties in one place.</p>
+        </div>
+        <a href="{% url 'core:add_property' %}" class="btn sr-btn-primary px-3">
+            <i class="bi bi-plus-circle me-1"></i> Add New Property
+        </a>
+    </div>
+
+    {% if properties %}
+        <div class="row g-4">
+            {% for property in properties %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card sr-card h-100 shadow-sm border-0 overflow-hidden d-flex flex-column">
+                        <!-- Image Container -->
+                        <div class="position-relative bg-light text-center" style="height: 200px; overflow: hidden;">
+                            {% if property.main_image %}
+                                <img src="{{ property.main_image }}" class="w-100 h-100 object-fit-cover" alt="{{ property.title }}">
+                            {% else %}
+                                <div class="d-flex align-items-center justify-content-center h-100 text-secondary bg-light">
+                                    <i class="bi bi-house-door fs-1 text-muted opacity-50"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Badges -->
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <span class="badge bg-dark bg-opacity-75 text-white fw-normal px-2 py-1 rounded">
+                                    {{ property.get_property_type_display }}
+                                </span>
+                            </div>
+                            <div class="position-absolute top-0 end-0 m-3">
+                                {% if property.is_available %}
+                                    <span class="badge bg-success text-white fw-semibold px-2 py-1 shadow-sm">
+                                        <i class="bi bi-check-circle me-1"></i> Available
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary text-white fw-semibold px-2 py-1 shadow-sm">
+                                        <i class="bi bi-x-circle me-1"></i> Unavailable
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body p-3 d-flex flex-column flex-grow-1">
+                            <h5 class="fw-bold text-dark text-truncate mb-1" title="{{ property.title }}">
+                                {{ property.title }}
+                            </h5>
+                            <p class="text-muted small mb-2 text-truncate">
+                                <i class="bi bi-geo-alt me-1 text-danger"></i> {{ property.location }}
+                            </p>
+
+                            <!-- Quick Specs -->
+                            <div class="d-flex align-items-center gap-3 text-secondary small mb-3">
+                                <span><i class="bi bi-door-closed me-1"></i>{{ property.bedrooms }} Beds</span>
+                                <span><i class="bi bi-droplet me-1"></i>{{ property.bathrooms }} Baths</span>
+                                <span><i class="bi bi-lamp me-1"></i>{{ property.get_furnished_status_display }}</span>
+                            </div>
+
+                            <!-- Rent Details -->
+                            <div class="mt-auto pt-2 border-top d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <span class="text-muted small d-block">Monthly Rent</span>
+                                    <span class="fw-bold fs-5 text-success">₹{{ property.monthly_rent }}</span>
+                                </div>
+                                <div class="text-end">
+                                    <span class="text-muted small d-block">Deposit</span>
+                                    <span class="fw-semibold text-dark">₹{{ property.security_deposit }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex align-items-center justify-content-between gap-1">
+                                <a href="{% url 'core:property_detail' property.pk %}" class="btn btn-outline-primary btn-sm flex-fill fw-semibold">
+                                    <i class="bi bi-eye me-1"></i> Details
+                                </a>
+                                <a href="{% url 'core:edit_property' property.pk %}" class="btn btn-outline-secondary btn-sm flex-fill fw-semibold">
+                                    <i class="bi bi-pencil me-1"></i> Edit
+                                </a>
+                                <a href="{% url 'core:delete_property' property.pk %}" class="btn btn-outline-danger btn-sm px-2" title="Delete Property">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State Banner -->
+        <div class="card sr-card p-5 text-center bg-white shadow-sm border-0">
+            <div class="py-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-light text-secondary p-3 rounded-circle mb-3">
+                    <i class="bi bi-building-add fs-1 text-success-accent"></i>
+                </div>
+                <h4 class="fw-bold text-dark">No properties listed yet</h4>
+                <p class="text-muted small max-w-500 mx-auto mb-4">
+                    You have not listed any rental properties. Add your first property to start accepting tenant requests.
+                </p>
+                <a href="{% url 'core:add_property' %}" class="btn sr-btn-primary px-4 fw-semibold">
+                    <i class="bi bi-plus-lg me-1"></i> List Your First Property
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

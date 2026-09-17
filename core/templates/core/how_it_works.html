@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | How It Works{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-dark">How SafeRent Works</h2>
+        <p class="text-muted">A step-by-step overview of the smart rental property management workflow.</p>
+    </div>
+</div>
+
+<div class="card sr-card p-4 mb-4">
+    <div class="row g-4 align-items-center">
+        <div class="col-md-3 text-center border-end border-light-subtle">
+            <span class="display-4 text-success fw-bold">01</span>
+            <h6 class="fw-bold mt-2">Registration &amp; Search</h6>
+            <p class="text-muted small mb-0">Tenants and Owners register accounts. Tenants search listings.</p>
+        </div>
+        <div class="col-md-3 text-center border-end border-light-subtle">
+            <span class="display-4 text-success fw-bold">02</span>
+            <h6 class="fw-bold mt-2">Rental Request</h6>
+            <p class="text-muted small mb-0">Tenant submits request. Owner reviews and approves.</p>
+        </div>
+        <div class="col-md-3 text-center border-end border-light-subtle">
+            <span class="display-4 text-success fw-bold">03</span>
+            <h6 class="fw-bold mt-2">Active Tenancy</h6>
+            <p class="text-muted small mb-0">Tenancy agreement generated. Rent &amp; utility charges tracked.</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <span class="display-4 text-success fw-bold">04</span>
+            <h6 class="fw-bold mt-2">Maintenance &amp; Settlement</h6>
+            <p class="text-muted small mb-0">Report issues, request renewal or move-out with deposit refund.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

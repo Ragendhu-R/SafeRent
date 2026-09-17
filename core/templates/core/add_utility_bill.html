@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | Add Monthly Utility Bill{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb & Header -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:owner_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'core:owner_utility_bills' %}" class="text-decoration-none">Utility Bills</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Utility Bill</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">Add Monthly Utility Bill</h2>
+        </div>
+        <a href="{% url 'core:owner_utility_bills' %}" class="btn btn-outline-secondary btn-sm px-3">
+            <i class="bi bi-arrow-left me-1"></i> Back to Utility Bills
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card sr-card p-4 shadow-sm border-0">
+                <div class="card-body p-2">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger mb-4" role="alert">
+                                {% for error in form.non_field_errors %}
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                        <div>{{ error }}</div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Section 1: Tenancy & Billing Month -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                                <i class="bi bi-house-door text-success me-2"></i>Tenancy &amp; Period Information
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.tenancy.id_for_label }}" class="form-label fw-semibold">
+                                    Active Tenancy / Tenant <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tenancy }}
+                                {% if form.tenancy.errors %}
+                                    <div class="text-danger small mt-1">{{ form.tenancy.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text small">Select the active tenant &amp; property for this bill.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.billing_month.id_for_label }}" class="form-label fw-semibold">
+                                    Billing Month <span class="text-danger">*</span>
+                                </label>
+                                {{ form.billing_month }}
+                                {% if form.billing_month.errors %}
+                                    <div class="text-danger small mt-1">{{ form.billing_month.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text small">Select the month for which utilities are being billed (e.g. September 2026).</div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Charge Breakdown -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                                <i class="bi bi-receipt text-success me-2"></i>Utility Breakdown (₹)
+                            </h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.electricity_charge.id_for_label }}" class="form-label fw-semibold">
+                                        Electricity Charge (₹) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">₹</span>
+                                        {{ form.electricity_charge }}
+                                    </div>
+                                    {% if form.electricity_charge.errors %}
+                                        <div class="text-danger small mt-1">{{ form.electricity_charge.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="{{ form.water_charge.id_for_label }}" class="form-label fw-semibold">
+                                        Water Charge (₹) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">₹</span>
+                                        {{ form.water_charge }}
+                                    </div>
+                                    {% if form.water_charge.errors %}
+                                        <div class="text-danger small mt-1">{{ form.water_charge.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="{{ form.maintenance_charge.id_for_label }}" class="form-label fw-semibold">
+                                        Maintenance Charge (₹) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">₹</span>
+                                        {{ form.maintenance_charge }}
+                                    </div>
+                                    {% if form.maintenance_charge.errors %}
+                                        <div class="text-danger small mt-1">{{ form.maintenance_charge.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="{{ form.other_charge.id_for_label }}" class="form-label fw-semibold">
+                                        Other Charge (₹) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">₹</span>
+                                        {{ form.other_charge }}
+                                    </div>
+                                    {% if form.other_charge.errors %}
+                                        <div class="text-danger small mt-1">{{ form.other_charge.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Real-time Calculated Total Display Card -->
+                        <div class="card bg-success bg-opacity-10 border-success border-opacity-25 p-3 mb-4 rounded-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <small class="text-muted text-uppercase fw-bold letter-spacing-1 d-block mb-1">Total Calculated Utilities</small>
+                                    <span class="text-muted small">Electricity + Water + Maintenance + Other</span>
+                                </div>
+                                <div class="text-end">
+                                    <h3 class="fw-bold text-success mb-0" id="calculated_total_display">₹0.00</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Optional Note -->
+                        <div class="mb-4">
+                            <label for="{{ form.note.id_for_label }}" class="form-label fw-semibold">
+                                Optional Note
+                            </label>
+                            {{ form.note }}
+                            {% if form.note.errors %}
+                                <div class="text-danger small mt-1">{{ form.note.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text small">Add meter reading details, notes, or explanations for the tenant.</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
+                            <a href="{% url 'core:owner_utility_bills' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                            <button type="submit" class="btn sr-btn-primary px-4">
+                                <i class="bi bi-check-circle me-1"></i> Save Utility Bill
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const elecInput = document.getElementById('id_electricity_charge');
+    const waterInput = document.getElementById('id_water_charge');
+    const maintInput = document.getElementById('id_maintenance_charge');
+    const otherInput = document.getElementById('id_other_charge');
+    const totalDisplay = document.getElementById('calculated_total_display');
+
+    function updateTotal() {
+        const e = parseFloat(elecInput ? elecInput.value : 0) || 0;
+        const w = parseFloat(waterInput ? waterInput.value : 0) || 0;
+        const m = parseFloat(maintInput ? maintInput.value : 0) || 0;
+        const o = parseFloat(otherInput ? otherInput.value : 0) || 0;
+        const total = e + w + m + o;
+        if (totalDisplay) {
+            totalDisplay.textContent = '₹' + total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+    }
+
+    [elecInput, waterInput, maintInput, otherInput].forEach(input => {
+        if (input) {
+            input.addEventListener('input', updateTotal);
+            input.addEventListener('change', updateTotal);
+            input.addEventListener('keyup', updateTotal);
+        }
+    });
+
+    updateTotal();
+});
+</script>
+{% endblock %}

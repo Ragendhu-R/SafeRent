@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | My Rental Agreement{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header & Action Buttons -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:tenant_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">My Agreement</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="bi bi-file-earmark-text text-success me-2"></i>My Rental Agreement
+            </h2>
+            <p class="text-muted small mb-0">View lease terms, agreement duration, and request agreement renewals.</p>
+        </div>
+        <a href="{% url 'accounts:tenant_dashboard' %}" class="btn btn-outline-secondary btn-sm px-3">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    {% if active_tenancy %}
+        <!-- Expiry Warning Banner (If approaching expiry <= 30 days) -->
+        {% if active_tenancy.is_approaching_expiry %}
+            <div class="alert alert-warning border-warning border-start border-4 shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 text-warning"></i>
+                        <div>
+                            <strong class="d-block text-dark">Agreement Approaching Expiry!</strong>
+                            <span>Your rental agreement expires in <strong>{{ active_tenancy.days_until_expiry }} days</strong> (on {{ active_tenancy.rental_end_date|date:"F d, Y" }}).</span>
+                        </div>
+                    </div>
+                    {% if not pending_renewal %}
+                        <a href="{% url 'core:request_agreement_renewal' %}" class="btn btn-warning btn-sm px-3 fw-semibold text-dark shadow-sm">
+                            <i class="bi bi-arrow-repeat me-1"></i> Request Renewal Now
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row g-4 mb-4">
+            <!-- Tenancy / Agreement Information Card -->
+            <div class="col-lg-8">
+                <div class="card sr-card p-4 shadow-sm border-0 border-top border-4 border-success mb-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-3 border-bottom">
+                        <div>
+                            <span class="badge bg-success text-white px-2.5 py-1 rounded-pill small mb-1">
+                                <i class="bi bi-shield-check me-1"></i>Active Lease Agreement
+                            </span>
+                            <h4 class="fw-bold text-dark mb-0">{{ active_tenancy.property.title }}</h4>
+                            <p class="text-muted small mb-0"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ active_tenancy.property.address }}, {{ active_tenancy.property.location }}</p>
+                        </div>
+                        {% if not pending_renewal %}
+                            <a href="{% url 'core:request_agreement_renewal' %}" class="btn sr-btn-primary btn-sm px-3 fw-semibold">
+                                <i class="bi bi-arrow-repeat me-1"></i> Request Renewal
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="bg-light p-3 rounded-3">
+                                <small class="text-muted d-block mb-1">Tenant Name</small>
+                                <strong class="text-dark fs-6">{{ active_tenancy.tenant.get_full_name|default:active_tenancy.tenant.username }}</strong>
+                                <div class="small text-muted">{{ active_tenancy.tenant.email }}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="bg-light p-3 rounded-3">
+                                <small class="text-muted d-block mb-1">Property Owner</small>
+                                <strong class="text-dark fs-6">{{ active_tenancy.owner.get_full_name|default:active_tenancy.owner.username }}</strong>
+                                <div class="small text-muted">{{ active_tenancy.owner.email }}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="bg-light p-3 rounded-3">
+                                <small class="text-muted d-block mb-1">Monthly Rent</small>
+                                <strong class="text-success fs-5">₹{{ active_tenancy.monthly_rent|floatformat:0 }}</strong>
+                                <div class="small text-muted">Due on {{ active_tenancy.rent_due_day }}th of every month</div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="bg-light p-3 rounded-3">
+                                <small class="text-muted d-block mb-1">Security Deposit</small>
+                                <strong class="text-dark fs-5">₹{{ active_tenancy.security_deposit|floatformat:0 }}</strong>
+                                <div class="small text-muted">Refundable upon move-out</div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="bg-light p-3 rounded-3">
+                                <small class="text-muted d-block mb-1">Agreement Start Date</small>
+                                <strong class="text-dark fs-6">{{ active_tenancy.rental_start_date|date:"F d, Y" }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="bg-light p-3 rounded-3">
+                                <small class="text-muted d-block mb-1">Agreement End Date</small>
+                                <strong class="text-dark fs-6">{{ active_tenancy.rental_end_date|date:"F d, Y" }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Renewal History List -->
+                <div class="card sr-card p-4 shadow-sm border-0">
+                    <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                        <i class="bi bi-clock-history me-2 text-success"></i>Renewal Request History
+                    </h5>
+                    {% if renewal_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light text-uppercase small text-muted border-bottom">
+                                    <tr>
+                                        <th class="py-2.5">Requested New End Date</th>
+                                        <th class="py-2.5">Submitted Date</th>
+                                        <th class="py-2.5">Status</th>
+                                        <th class="py-2.5">Landlord Response</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in renewal_requests %}
+                                        <tr>
+                                            <td class="py-3 fw-bold text-dark">
+                                                {{ req.requested_new_end_date|date:"F d, Y" }}
+                                            </td>
+                                            <td class="py-3 text-muted small">
+                                                {{ req.created_at|date:"M d, Y" }}
+                                            </td>
+                                            <td class="py-3">
+                                                {% if req.status == 'PENDING' %}
+                                                    <span class="badge bg-warning text-dark px-2.5 py-1 rounded-pill">
+                                                        <i class="bi bi-hourglass-split me-1"></i>Pending
+                                                    </span>
+                                                {% elif req.status == 'APPROVED' %}
+                                                    <span class="badge bg-success text-white px-2.5 py-1 rounded-pill">
+                                                        <i class="bi bi-check-circle me-1"></i>Approved
+                                                    </span>
+                                                {% elif req.status == 'REJECTED' %}
+                                                    <span class="badge bg-danger text-white px-2.5 py-1 rounded-pill">
+                                                        <i class="bi bi-x-circle me-1"></i>Rejected
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="py-3 small text-secondary">
+                                                {{ req.owner_response|default:"—" }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">No lease renewal requests submitted yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sidebar Duration Summary Card -->
+            <div class="col-lg-4">
+                <div class="card sr-card p-4 shadow-sm border-0 text-center bg-white mb-4">
+                    <div class="py-2">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success p-3 rounded-circle mb-3">
+                            <i class="bi bi-calendar-range fs-2"></i>
+                        </div>
+                        <small class="text-muted d-block text-uppercase fw-bold mb-1">Time Remaining on Lease</small>
+                        {% if active_tenancy.days_until_expiry > 0 %}
+                            <h2 class="fw-bold text-success mb-1">{{ active_tenancy.days_until_expiry }} Days</h2>
+                            <p class="text-muted small mb-0">Lease ends on {{ active_tenancy.rental_end_date|date:"M d, Y" }}</p>
+                        {% elif active_tenancy.days_until_expiry == 0 %}
+                            <h2 class="fw-bold text-danger mb-1">Expires Today</h2>
+                            <p class="text-muted small mb-0">Lease ends today, {{ active_tenancy.rental_end_date|date:"M d, Y" }}</p>
+                        {% else %}
+                            <h2 class="fw-bold text-danger mb-1">Expired</h2>
+                            <p class="text-muted small mb-0">Lease ended on {{ active_tenancy.rental_end_date|date:"M d, Y" }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if pending_renewal %}
+                    <div class="card bg-warning bg-opacity-10 border-warning p-4 rounded-3 shadow-sm">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-clock me-1"></i>Pending Renewal Request</h6>
+                        <p class="small text-muted mb-2">You have submitted a request to extend your lease end date to <strong>{{ pending_renewal.requested_new_end_date|date:"F d, Y" }}</strong>.</p>
+                        <div class="extra-small text-secondary">Awaiting landlord response. You cannot submit another renewal request while one is pending.</div>
+                    </div>
+                {% else %}
+                    <div class="card p-4 shadow-sm border-0 bg-light text-center">
+                        <h6 class="fw-bold text-dark mb-2">Want to extend your stay?</h6>
+                        <p class="text-muted small mb-3">Submit a lease renewal request to request an extension of your rental end date.</p>
+                        <a href="{% url 'core:request_agreement_renewal' %}" class="btn sr-btn-primary btn-sm px-3 fw-semibold">
+                            <i class="bi bi-arrow-repeat me-1"></i> Request Lease Renewal
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State (No active tenancy) -->
+        <div class="card sr-card p-5 text-center bg-white shadow-sm border-0">
+            <div class="py-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-light text-secondary p-3.5 rounded-circle mb-3">
+                    <i class="bi bi-file-earmark-x fs-1 text-muted"></i>
+                </div>
+                <h4 class="fw-bold text-dark">You don't have an active rental.</h4>
+                <p class="text-muted small max-w-500 mx-auto mb-4">
+                    Once a property owner accepts your rental request, your lease agreement terms and renewal controls will appear here.
+                </p>
+                <a href="{% url 'core:properties' %}" class="btn sr-btn-primary px-4 fw-semibold">
+                    <i class="bi bi-search me-1"></i> Browse Properties
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

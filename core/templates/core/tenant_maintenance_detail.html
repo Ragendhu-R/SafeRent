@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | Maintenance Request #{{ mreq.pk }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header & Breadcrumbs -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:tenant_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'core:tenant_maintenance_list' %}" class="text-decoration-none">Maintenance Requests</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Request #{{ mreq.pk }}</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">{{ mreq.title }}</h2>
+        </div>
+        <a href="{% url 'core:tenant_maintenance_list' %}" class="btn btn-outline-secondary btn-sm px-3">
+            <i class="bi bi-arrow-left me-1"></i> Back to List
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Request Details -->
+        <div class="col-lg-8">
+            <div class="card sr-card p-4 shadow-sm border-0 mb-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-3 border-bottom">
+                    <div>
+                        <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-pill me-2">
+                            <i class="bi bi-tag me-1"></i>{{ mreq.get_category_display }}
+                        </span>
+                        {% if mreq.priority == 'HIGH' %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger fw-bold px-2.5 py-1.5 rounded-pill me-2">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i>High Priority
+                            </span>
+                        {% elif mreq.priority == 'MEDIUM' %}
+                            <span class="badge bg-warning bg-opacity-10 text-warning fw-bold px-2.5 py-1.5 rounded-pill me-2">
+                                Medium Priority
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold px-2.5 py-1.5 rounded-pill me-2">
+                                Low Priority
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        {% if mreq.status == 'PENDING' %}
+                            <span class="badge bg-warning text-dark px-3 py-1.5 rounded-pill fs-6">
+                                <i class="bi bi-hourglass-split me-1"></i>Pending Review
+                            </span>
+                        {% elif mreq.status == 'ACCEPTED' %}
+                            <span class="badge bg-info text-white px-3 py-1.5 rounded-pill fs-6">
+                                <i class="bi bi-check-circle me-1"></i>Accepted
+                            </span>
+                        {% elif mreq.status == 'IN_PROGRESS' %}
+                            <span class="badge bg-primary text-white px-3 py-1.5 rounded-pill fs-6">
+                                <i class="bi bi-gear-wide-connected me-1"></i>In Progress
+                            </span>
+                        {% elif mreq.status == 'COMPLETED' %}
+                            <span class="badge bg-success text-white px-3 py-1.5 rounded-pill fs-6">
+                                <i class="bi bi-check-all me-1"></i>Completed
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-2">Problem Description</h6>
+                    <div class="bg-light p-3 rounded-3 text-dark style-whitespace-pre-line">
+                        {{ mreq.description }}
+                    </div>
+                </div>
+
+                {% if mreq.photo %}
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-image me-1 text-primary"></i>Uploaded Problem Photo</h6>
+                        <div class="p-2 border rounded-3 bg-light text-center d-inline-block max-w-100">
+                            <a href="{{ mreq.photo.url }}" target="_blank">
+                                <img src="{{ mreq.photo.url }}" alt="Problem Photo" class="img-fluid rounded max-h-400">
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Landlord Response Note Card -->
+            <div class="card sr-card p-4 shadow-sm border-0 border-start border-4 border-success">
+                <h5 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-chat-square-text text-success me-2"></i>Landlord Update &amp; Response
+                </h5>
+                {% if mreq.owner_response %}
+                    <div class="bg-success bg-opacity-10 p-3 rounded-3 text-dark mb-2 style-whitespace-pre-line">
+                        {{ mreq.owner_response }}
+                    </div>
+                {% else %}
+                    <p class="text-muted small mb-0">No response note added by landlord yet.</p>
+                {% endif %}
+
+                {% if mreq.completed_at %}
+                    <div class="mt-3 pt-2 border-top text-success small fw-semibold">
+                        <i class="bi bi-calendar-check me-1"></i>Work completed on {{ mreq.completed_at|date:"F d, Y \a\t h:i A" }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar Summary Card -->
+        <div class="col-lg-4">
+            <div class="card sr-card p-4 shadow-sm border-0">
+                <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom">Request Info</h6>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">Property</small>
+                    <strong class="text-dark d-block">{{ mreq.tenancy.property.title }}</strong>
+                    <small class="text-muted">{{ mreq.tenancy.property.location }}</small>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block">Landlord</small>
+                    <strong class="text-dark">{{ mreq.tenancy.owner.get_full_name|default:mreq.tenancy.owner.username }}</strong>
+                    <div class="small text-muted">{{ mreq.tenancy.owner.email }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block">Submitted Date</small>
+                    <strong class="text-dark">{{ mreq.submitted_at|date:"F d, Y \a\t h:i A" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | Rent Payment Receipt #{{ payment.receipt_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        /* Hide navbar, footer, action buttons, and extraneous containers during printing */
+        .navbar, footer, .no-print, .alert {
+            display: none !important;
+        }
+        body {
+            background-color: #fff !important;
+            color: #000 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .container {
+            max-width: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .receipt-card {
+            border: 1px solid #dee2e6 !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 2rem !important;
+        }
+    }
+
+    .receipt-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    .receipt-header {
+        border-bottom: 2px dashed #e9ecef;
+    }
+    .watermark-paid {
+        display: inline-block;
+        border: 2px solid #198754;
+        color: #198754;
+        font-weight: 800;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        padding: 4px 12px;
+        border-radius: 6px;
+        text-transform: uppercase;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Non-printable top action bar -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4 no-print">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">
+                <i class="bi bi-receipt-cutoff text-success me-2"></i>Rent Payment Receipt
+            </h3>
+            <p class="text-muted small mb-0">Official receipt for completed rent payment.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button onclick="window.print();" class="btn btn-success px-4 fw-semibold shadow-sm">
+                <i class="bi bi-printer me-2"></i>Print / Save as PDF
+            </button>
+            {% if request.user.role == 'OWNER' %}
+                <a href="{% url 'core:owner_rent_tracking' %}" class="btn btn-outline-secondary px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Rent Tracking
+                </a>
+            {% else %}
+                <a href="{% url 'core:tenant_payment_history' %}" class="btn btn-outline-secondary px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Payment History
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Printable Receipt Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card receipt-card p-4 p-md-5 border-0">
+                <!-- Receipt Header -->
+                <div class="receipt-header pb-4 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="bg-success bg-opacity-10 text-success p-2 rounded-circle">
+                                <i class="bi bi-house-door-fill fs-4"></i>
+                            </span>
+                            <span class="fs-3 fw-bold text-dark tracking-tight">Safe<span class="text-success">Rent</span></span>
+                        </div>
+                        <p class="text-muted small mb-0">Official Rent Payment Receipt</p>
+                    </div>
+                    <div class="text-md-end">
+                        <div class="watermark-paid mb-2">
+                            <i class="bi bi-check-circle-fill me-1"></i> PAID
+                        </div>
+                        <div class="small text-muted">
+                            <div><strong>Receipt No:</strong> <span class="text-dark fw-bold">{{ payment.receipt_number }}</span></div>
+                            <div><strong>Date Issued:</strong> {{ payment.paid_at|date:"d M Y, h:i A" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction Reference Code -->
+                <div class="bg-light p-3 rounded-3 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2 border">
+                    <span class="text-muted small fw-semibold">Transaction ID:</span>
+                    <code class="text-primary fs-6 fw-bold mb-0">{{ payment.transaction_id }}</code>
+                </div>
+
+                <!-- Receipt Body Grid -->
+                <div class="row g-4 mb-4">
+                    <!-- Tenant & Owner Information -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-white rounded-3 border h-100">
+                            <h6 class="fw-bold text-success text-uppercase extra-small mb-2">
+                                <i class="bi bi-person me-1"></i> Tenant Details
+                            </h6>
+                            <h5 class="fw-bold text-dark mb-1">{{ payment.tenant.get_full_name|default:payment.tenant.username }}</h5>
+                            <p class="text-muted small mb-0"><i class="bi bi-envelope me-1"></i>{{ payment.tenant.email }}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="p-3 bg-white rounded-3 border h-100">
+                            <h6 class="fw-bold text-primary text-uppercase extra-small mb-2">
+                                <i class="bi bi-building me-1"></i> Property Owner Details
+                            </h6>
+                            <h5 class="fw-bold text-dark mb-1">{{ payment.owner.get_full_name|default:payment.owner.username }}</h5>
+                            <p class="text-muted small mb-0"><i class="bi bi-envelope me-1"></i>{{ payment.owner.email }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Property Details -->
+                    <div class="col-12">
+                        <div class="p-3 bg-white rounded-3 border">
+                            <h6 class="fw-bold text-dark text-uppercase extra-small mb-2">
+                                <i class="bi bi-geo-alt me-1"></i> Property Information
+                            </h6>
+                            <h6 class="fw-bold text-dark mb-1">{{ payment.property.title }}</h6>
+                            <p class="text-muted small mb-0">
+                                {{ payment.property.address }}, {{ payment.property.location }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Summary Breakdown Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered align-middle">
+                        <thead class="bg-light text-uppercase extra-small text-muted">
+                            <tr>
+                                <th>Description</th>
+                                <th>Rent Month</th>
+                                <th>Due Date</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong class="text-dark d-block">Monthly Rent Payment</strong>
+                                    <small class="text-muted">SafeRent Lease Obligation</small>
+                                </td>
+                                <td class="fw-semibold text-dark">{{ payment.rent_record.rent_month|date:"F Y" }}</td>
+                                <td class="small text-muted">{{ payment.rent_record.due_date|date:"d M Y" }}</td>
+                                <td class="text-end fw-bold text-dark">₹{{ payment.rent_record.amount|floatformat:0 }}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-light">
+                            <tr>
+                                <th colspan="3" class="text-end text-uppercase small text-muted">Total Amount Paid:</th>
+                                <th class="text-end text-success fs-5 fw-bold">₹{{ payment.amount_paid|floatformat:0 }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Payment Method & Verification Footer -->
+                <div class="row align-items-center pt-3 border-top g-3">
+                    <div class="col-md-6">
+                        <span class="text-muted small d-block mb-1">Payment Method:</span>
+                        <span class="badge bg-light text-dark border px-3 py-2 fw-semibold">
+                            <i class="bi bi-shield-check text-success me-1"></i>{{ payment.get_payment_method_display }} (Simulated)
+                        </span>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <small class="text-muted d-block mb-1">Status Verified By SafeRent</small>
+                        <span class="text-success fw-bold small">
+                            <i class="bi bi-check-circle-fill me-1"></i> Verified Transaction
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Print Footer Notice -->
+                <div class="text-center pt-4 mt-4 border-top">
+                    <p class="text-muted extra-small mb-0">
+                        This is a computer-generated simulated receipt for SafeRent academic project demonstration. No physical signature required.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

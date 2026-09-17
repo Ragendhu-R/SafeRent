@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | Utility Bills Management{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header & Action Button -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:owner_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Utility Bills</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="bi bi-receipt text-success me-2"></i>Utility Bills Management
+            </h2>
+            <p class="text-muted small mb-0">Record and monitor monthly electricity, water, and maintenance utility charges for your active tenancies.</p>
+        </div>
+        <a href="{% url 'core:add_utility_bill' %}" class="btn sr-btn-primary px-3 shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Utility Bill
+        </a>
+    </div>
+
+    {% if utility_bills %}
+        <!-- Utility Bills List / Table -->
+        <div class="card sr-card shadow-sm border-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase small text-muted border-bottom">
+                        <tr>
+                            <th class="py-3 ps-4">Property &amp; Tenant</th>
+                            <th class="py-3">Billing Month</th>
+                            <th class="py-3 text-end">Electricity</th>
+                            <th class="py-3 text-end">Water</th>
+                            <th class="py-3 text-end">Maintenance</th>
+                            <th class="py-3 text-end">Other</th>
+                            <th class="py-3 text-end pe-4">Total Utilities</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in utility_bills %}
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="fw-bold text-dark">{{ bill.tenancy.property.title }}</div>
+                                    <div class="small text-muted">
+                                        <i class="bi bi-person me-1"></i>Tenant: <strong class="text-dark">{{ bill.tenancy.tenant.get_full_name|default:bill.tenancy.tenant.username }}</strong>
+                                    </div>
+                                    {% if bill.note %}
+                                        <div class="extra-small text-secondary mt-1">
+                                            <i class="bi bi-info-circle me-1"></i>Note: {{ bill.note }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1.5 rounded-pill">
+                                        <i class="bi bi-calendar-check me-1"></i>{{ bill.billing_month|date:"F Y" }}
+                                    </span>
+                                </td>
+                                <td class="py-3 text-end fw-semibold text-dark">₹{{ bill.electricity_charge|floatformat:2 }}</td>
+                                <td class="py-3 text-end fw-semibold text-dark">₹{{ bill.water_charge|floatformat:2 }}</td>
+                                <td class="py-3 text-end fw-semibold text-dark">₹{{ bill.maintenance_charge|floatformat:2 }}</td>
+                                <td class="py-3 text-end fw-semibold text-dark">₹{{ bill.other_charge|floatformat:2 }}</td>
+                                <td class="py-3 text-end pe-4">
+                                    <strong class="fs-6 text-success">₹{{ bill.total_utility_charges|floatformat:2 }}</strong>
+                                    <div class="extra-small text-muted">Added {{ bill.created_at|date:"M d, Y" }}</div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="card sr-card p-5 text-center bg-white shadow-sm border-0">
+            <div class="py-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-light text-secondary p-3.5 rounded-circle mb-3">
+                    <i class="bi bi-receipt-cutoff fs-1 text-success"></i>
+                </div>
+                <h4 class="fw-bold text-dark">No utility bills recorded yet.</h4>
+                <p class="text-muted small max-w-500 mx-auto mb-4">
+                    Create monthly utility statements for your active tenants to provide clear breakdowns of electricity, water, and maintenance charges.
+                </p>
+                <a href="{% url 'core:add_utility_bill' %}" class="btn sr-btn-primary px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Add Utility Bill
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | Request to Rent {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'core:properties' %}" class="text-decoration-none">Properties</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'core:public_property_detail' property.pk %}" class="text-decoration-none">{{ property.title|truncatechars:20 }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Request to Rent</li>
+                </ol>
+            </nav>
+
+            <div class="card sr-card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3 px-4">
+                    <h4 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-send-check text-success-accent me-2"></i>Submit Rental Request
+                    </h4>
+                    <small class="text-muted">Send your rental application directly to the property owner.</small>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Property Summary Box -->
+                    <div class="card bg-light border-0 p-3 mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            {% if property.main_image %}
+                                <img src="{{ property.main_image }}" class="rounded object-fit-cover" style="width: 80px; height: 80px;" alt="{{ property.title }}">
+                            {% else %}
+                                <div class="bg-secondary bg-opacity-10 text-secondary rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-building fs-2"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">{{ property.title }}</h5>
+                                <p class="text-muted small mb-1">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ property.location }}
+                                </p>
+                                <span class="fw-bold text-success">₹{{ property.monthly_rent }} / month</span>
+                                <span class="text-muted small ms-2">(Deposit: ₹{{ property.security_deposit }})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.requested_move_in_date.id_for_label }}" class="form-label fw-semibold">
+                                Requested Move-in Date <span class="text-danger">*</span>
+                            </label>
+                            {{ form.requested_move_in_date }}
+                            <small class="text-muted">Select your intended move-in date (must be today or in the future).</small>
+                            {% if form.requested_move_in_date.errors %}
+                                <div class="text-danger small mt-1">{{ form.requested_move_in_date.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.message.id_for_label }}" class="form-label fw-semibold">
+                                Message to Property Owner (Optional)
+                            </label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div class="text-danger small mt-1">{{ form.message.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
+                            <a href="{% url 'core:public_property_detail' property.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn sr-btn-primary px-4 fw-semibold">
+                                <i class="bi bi-send me-1"></i> Submit Rental Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

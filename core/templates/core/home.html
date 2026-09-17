@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SafeRent | Find Your Next Rental Home{% endblock %}
+
+{% block content %}
+<!-- Modern Rental Hero Section -->
+<div class="sr-hero-wrapper text-center mb-5">
+    <div class="container">
+        <h1 class="sr-hero-title mb-3">Find Your Next Home</h1>
+        <p class="sr-hero-subtitle mb-4">
+            Discover rental homes and rooms, connect with property owners, and manage your entire rental journey with SafeRent.
+        </p>
+
+        <!-- Search Box -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="sr-search-card text-start">
+                    <form action="{% url 'core:properties' %}" method="GET">
+                        <div class="row g-3 align-items-end">
+                            <!-- Location -->
+                            <div class="col-md-3">
+                                <label for="searchLocation" class="form-label fw-semibold small text-muted">Location</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </span>
+                                    <input type="text" name="location" class="form-control border-start-0 ps-0" id="searchLocation" placeholder="e.g. Kakkanad, Kochi">
+                                </div>
+                            </div>
+
+                            <!-- Rent Range -->
+                            <div class="col-md-3">
+                                <label for="searchRent" class="form-label fw-semibold small text-muted">Rent Range</label>
+                                <select name="rent_range" class="form-select" id="searchRent">
+                                    <option value="" selected>Any Rent Range</option>
+                                    <option value="1">Under ₹5,000</option>
+                                    <option value="2">₹5,000 - ₹10,000</option>
+                                    <option value="3">₹10,000 - ₹20,000</option>
+                                    <option value="4">₹20,000+</option>
+                                </select>
+                            </div>
+
+                            <!-- Property Type -->
+                            <div class="col-md-3">
+                                <label for="searchType" class="form-label fw-semibold small text-muted">Property Type</label>
+                                <select name="property_type" class="form-select" id="searchType">
+                                    <option value="ALL" selected>All Property Types</option>
+                                    <option value="APARTMENT">Apartment</option>
+                                    <option value="HOUSE">House</option>
+                                    <option value="ROOM">Single Room</option>
+                                    <option value="SHARED">Shared Room</option>
+                                </select>
+                            </div>
+
+                            <!-- Search Button -->
+                            <div class="col-md-3">
+                                <button type="submit" class="btn sr-btn-primary w-100 py-2">
+                                    <i class="bi bi-search me-1"></i> Search Properties
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Featured Properties Section -->
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Featured Properties</h3>
+                <p class="text-muted small mb-0">Explore handpicked available properties ready for move-in.</p>
+            </div>
+            <a href="{% url 'core:properties' %}" class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold">
+                View All Properties <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        {% if featured_properties %}
+            <div class="row g-4">
+                {% for property in featured_properties %}
+                    <div class="col-md-4">
+                        <div class="sr-property-card h-100 d-flex flex-column">
+                            <div class="sr-property-img-placeholder position-relative" style="height: 200px; overflow: hidden; background-color: #f8f9fa;">
+                                {% if property.main_image %}
+                                    <img src="{{ property.main_image }}" class="w-100 h-100 object-fit-cover" alt="{{ property.title }}">
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-secondary">
+                                        <i class="bi bi-building fs-1 opacity-50"></i>
+                                    </div>
+                                {% endif %}
+                                <span class="sr-rent-badge">₹{{ property.monthly_rent }} / mo</span>
+                            </div>
+                            <div class="p-3 d-flex flex-column flex-grow-1">
+                                <h5 class="fw-bold text-dark mb-1 text-truncate" title="{{ property.title }}">{{ property.title }}</h5>
+                                <p class="text-muted small mb-3 text-truncate">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ property.location }}
+                                </p>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="sr-facility-badge"><i class="bi bi-lamp me-1"></i>{{ property.get_furnished_status_display }}</span>
+                                    {% if property.wifi_available %}
+                                        <span class="sr-facility-badge"><i class="bi bi-wifi me-1"></i>Wi-Fi</span>
+                                    {% endif %}
+                                    {% if property.parking_available %}
+                                        <span class="sr-facility-badge"><i class="bi bi-p-square me-1"></i>Parking</span>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-auto">
+                                    <a href="{% url 'core:public_property_detail' property.pk %}" class="btn btn-outline-success btn-sm w-100 fw-semibold rounded-2">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Friendly Empty State for Homepage -->
+            <div class="card sr-card p-4 text-center my-3 bg-white shadow-sm border-0">
+                <div class="py-3">
+                    <i class="bi bi-house-dash fs-2 text-muted mb-2 d-block"></i>
+                    <h5 class="fw-bold text-dark mb-1">No featured properties are currently available</h5>
+                    <p class="text-muted small mb-0">Check back soon as owners list new rental properties on SafeRent.</p>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+
+
+    <!-- How SafeRent Works Section -->
+    <section class="py-4 my-4">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold text-dark mb-2">How SafeRent Works</h3>
+            <p class="text-muted small">Simple step-by-step process for tenants and property owners.</p>
+        </div>
+
+        <div class="row g-4 text-center">
+            <!-- Step 1 -->
+            <div class="col-md-3">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="sr-step-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">1. Search Property</h6>
+                    <p class="text-muted small">Find rooms and houses matching your location and budget requirements.</p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="col-md-3">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="sr-step-icon">
+                        <i class="bi bi-send-check"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">2. Send Request</h6>
+                    <p class="text-muted small">Send a rental request directly to the property owner with one click.</p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="col-md-3">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="sr-step-icon">
+                        <i class="bi bi-key"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">3. Start Renting</h6>
+                    <p class="text-muted small">Once approved, the property becomes your official active rental.</p>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="col-md-3">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="sr-step-icon">
+                        <i class="bi bi-sliders"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">4. Manage Everything</h6>
+                    <p class="text-muted small">Track rent, payments, maintenance and agreements from your dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why SafeRent Section -->
+    <section class="my-5">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold text-dark mb-2">Why Choose SafeRent</h3>
+            <p class="text-muted small">All-in-one platform for effortless rental property management.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="sr-feature-card h-100">
+                    <div class="sr-feature-icon mb-3">
+                        <i class="bi bi-house-search"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">Easy Property Search</h6>
+                    <p class="text-muted small mb-0">Browse listings with detailed photos, pricing, and facility filters.</p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="sr-feature-card h-100">
+                    <div class="sr-feature-icon mb-3">
+                        <i class="bi bi-building-gear"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">Rental Management</h6>
+                    <p class="text-muted small mb-0">Seamless connections between property owners and tenants.</p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="sr-feature-card h-100">
+                    <div class="sr-feature-icon mb-3">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">Rent &amp; Due-Date Tracking</h6>
+                    <p class="text-muted small mb-0">Automatic due date tracking, receipts, and utility bill breakdown.</p>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="sr-feature-card h-100">
+                    <div class="sr-feature-icon mb-3">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">Maintenance Support</h6>
+                    <p class="text-muted small mb-0">Report repairs online and track status directly with your landlord.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

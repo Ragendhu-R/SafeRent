@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | My Rental Requests{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Navigation -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-inbox text-success-accent me-2"></i>My Rental Requests
+            </h2>
+            <p class="text-muted small mb-0">Track all rental applications submitted for available properties.</p>
+        </div>
+        <a href="{% url 'core:properties' %}" class="btn sr-btn-primary px-3">
+            <i class="bi bi-search me-1"></i> Browse More Properties
+        </a>
+    </div>
+
+    {% if rental_requests %}
+        <div class="card sr-card shadow-sm border-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-uppercase small text-muted">
+                        <tr>
+                            <th scope="col" class="ps-4">Property</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Owner</th>
+                            <th scope="col">Requested Move-in</th>
+                            <th scope="col">Submitted On</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in rental_requests %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        {% if req.property.main_image %}
+                                            <img src="{{ req.property.main_image }}" class="rounded object-fit-cover" style="width: 50px; height: 50px;" alt="{{ req.property.title }}">
+                                        {% else %}
+                                            <div class="bg-light text-secondary rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                <i class="bi bi-building fs-5"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <span class="fw-bold text-dark d-block">{{ req.property.title }}</span>
+                                            <small class="text-success fw-semibold">₹{{ req.property.monthly_rent }}/mo</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="small text-muted">
+                                        <i class="bi bi-geo-alt text-danger me-1"></i>{{ req.property.location }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold small text-dark">
+                                        {{ req.owner.first_name|default:req.owner.username }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark small">
+                                        {{ req.requested_move_in_date|date:"M d, Y" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="small text-muted">
+                                        {{ req.created_at|date:"M d, Y" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if req.status == 'PENDING' %}
+                                        <span class="badge bg-warning text-dark px-3 py-1">
+                                            <i class="bi bi-clock-history me-1"></i> Pending
+                                        </span>
+                                    {% elif req.status == 'ACCEPTED' %}
+                                        <span class="badge bg-info text-white px-3 py-1">
+                                            <i class="bi bi-check-circle me-1"></i> Accepted
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger text-white px-3 py-1">
+                                            <i class="bi bi-x-circle me-1"></i> Rejected
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'core:public_property_detail' req.property.pk %}" class="btn btn-outline-secondary btn-sm">
+                                        View Listing
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="card sr-card p-5 text-center bg-white shadow-sm border-0">
+            <div class="py-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-light text-secondary p-3 rounded-circle mb-3">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                </div>
+                <h4 class="fw-bold text-dark">No rental requests yet.</h4>
+                <p class="text-muted small max-w-500 mx-auto mb-4">
+                    Explore available properties and submit rental applications to connect with property owners.
+                </p>
+                <a href="{% url 'core:properties' %}" class="btn sr-btn-primary px-4 fw-semibold">
+                    <i class="bi bi-search me-1"></i> Browse Properties
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
