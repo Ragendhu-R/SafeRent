@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}SafeRent | Create Account{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-lg-7 col-md-9">
+        <div class="card sr-card p-4 p-md-5">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success p-3 rounded-circle mb-3">
+                    <i class="bi bi-person-plus-fill fs-3"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-1">Create Your SafeRent Account</h3>
+                <p class="text-muted small">Find your next home or manage your rental properties in one place.</p>
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger mb-4">
+                    {% for error in form.non_field_errors %}
+                        <div><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <!-- Role Selection Section -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-dark mb-2">I want to use SafeRent as:</label>
+                    <div class="row g-3">
+                        <!-- Tenant Option -->
+                        <div class="col-sm-6">
+                            <input type="radio" class="btn-check" name="role" id="roleTenant" value="TENANT" {% if form.role.value == 'TENANT' or not form.role.value %}checked{% endif %}>
+                            <label class="btn btn-outline-success w-100 h-100 p-3 text-start d-flex flex-column rounded-3" for="roleTenant">
+                                <div class="d-flex align-items-center justify-content-between w-100 mb-2">
+                                    <span class="fw-bold fs-6"><i class="bi bi-person-heart me-1"></i> Tenant</span>
+                                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                </div>
+                                <span class="small text-muted fw-normal">Find and manage my rental home</span>
+                            </label>
+                        </div>
+
+                        <!-- Property Owner Option -->
+                        <div class="col-sm-6">
+                            <input type="radio" class="btn-check" name="role" id="roleOwner" value="OWNER" {% if form.role.value == 'OWNER' %}checked{% endif %}>
+                            <label class="btn btn-outline-success w-100 h-100 p-3 text-start d-flex flex-column rounded-3" for="roleOwner">
+                                <div class="d-flex align-items-center justify-content-between w-100 mb-2">
+                                    <span class="fw-bold fs-6"><i class="bi bi-building-gear me-1"></i> Property Owner</span>
+                                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                </div>
+                                <span class="small text-muted fw-normal">List and manage my rental properties</span>
+                            </label>
+                        </div>
+                    </div>
+                    {% if form.role.errors %}
+                        <div class="text-danger small mt-1">{{ form.role.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <!-- First Name -->
+                    <div class="col-sm-6">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label small fw-bold text-secondary">First Name <span class="text-danger">*</span></label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="col-sm-6">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label small fw-bold text-secondary">Last Name <span class="text-danger">*</span></label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <!-- Username -->
+                    <div class="col-sm-6">
+                        <label for="{{ form.username.id_for_label }}" class="form-label small fw-bold text-secondary">Username <span class="text-danger">*</span></label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="col-sm-6">
+                        <label for="{{ form.phone_number.id_for_label }}" class="form-label small fw-bold text-secondary">Phone Number</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                            <div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="{{ form.email.id_for_label }}" class="form-label small fw-bold text-secondary">Email Address <span class="text-danger">*</span></label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <!-- Password -->
+                    <div class="col-sm-6">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label small fw-bold text-secondary">Password <span class="text-danger">*</span></label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="text-danger small mt-1">{{ form.password1.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="col-sm-6">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label small fw-bold text-secondary">Confirm Password <span class="text-danger">*</span></label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="text-danger small mt-1">{{ form.password2.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn sr-btn-primary w-100 py-2.5 mb-3 fs-6">
+                    <i class="bi bi-person-check-fill me-2"></i>Create Account
+                </button>
+            </form>
+
+            <div class="text-center mt-3 pt-3 border-top">
+                <p class="text-muted small mb-0">
+                    Already have an account? <a href="{% url 'accounts:login' %}" class="fw-bold text-success text-decoration-none">Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
