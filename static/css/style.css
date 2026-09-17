@@ -1,0 +1,238 @@
+/* SafeRent Real Property Marketplace Theme */
+
+:root {
+  --sr-dark-teal: #0d3b44;
+  --sr-dark-teal-hover: #07282e;
+  --sr-green-accent: #198754;
+  --sr-green-accent-hover: #146c43;
+  --sr-light-bg: #f8f9fa;
+  --sr-card-bg: #ffffff;
+  --sr-text-dark: #1e293b;
+  --sr-text-muted: #64748b;
+  --sr-border-color: #e2e8f0;
+  --sr-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+  --sr-shadow-md: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+body {
+  background-color: var(--sr-light-bg);
+  color: var(--sr-text-dark);
+  font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* Navbar */
+.sr-navbar {
+  background-color: var(--sr-dark-teal) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.sr-navbar .navbar-brand {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #ffffff !important;
+}
+
+.text-success-accent {
+  color: #20c997 !important;
+}
+
+.sr-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  padding: 0.4rem 0.9rem !important;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.sr-navbar .nav-link:hover,
+.sr-navbar .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.sr-btn-outline {
+  border: 1.5px solid #20c997;
+  color: #20c997 !important;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.sr-btn-outline:hover {
+  background-color: #20c997;
+  color: var(--sr-dark-teal) !important;
+}
+
+.sr-btn-primary {
+  background-color: var(--sr-green-accent);
+  color: #ffffff !important;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.sr-btn-primary:hover {
+  background-color: var(--sr-green-accent-hover);
+  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+}
+
+/* Hero Marketplace Banner */
+.sr-hero-wrapper {
+  background: linear-gradient(135deg, #092e35 0%, var(--sr-dark-teal) 60%, #155562 100%);
+  color: #ffffff;
+  padding: 4rem 1rem 5rem 1rem;
+}
+
+.sr-hero-title {
+  font-weight: 800;
+  font-size: 2.75rem;
+  letter-spacing: -0.5px;
+}
+
+.sr-hero-subtitle {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Property Search Card */
+.sr-search-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: var(--sr-shadow-md);
+  padding: 1.5rem;
+  border: 1px solid var(--sr-border-color);
+}
+
+.sr-search-card label {
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--sr-text-dark);
+  margin-bottom: 0.35rem;
+}
+
+.sr-search-card .form-control,
+.sr-search-card .form-select {
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.95rem;
+}
+
+.sr-search-card .form-control:focus,
+.sr-search-card .form-select:focus {
+  border-color: var(--sr-green-accent);
+  box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.15);
+}
+
+/* Property Cards */
+.sr-property-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid var(--sr-border-color);
+  box-shadow: var(--sr-shadow-sm);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sr-property-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sr-shadow-md);
+}
+
+.sr-property-img-placeholder {
+  height: 190px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.sr-property-img-placeholder i {
+  font-size: 3.5rem;
+  color: #94a3b8;
+}
+
+.sr-rent-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: var(--sr-dark-teal);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.sr-facility-badge {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3em 0.7em;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+/* How It Works Steps */
+.sr-step-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background-color: rgba(25, 135, 84, 0.1);
+  color: var(--sr-green-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+
+/* Why SafeRent Cards */
+.sr-feature-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid var(--sr-border-color);
+  padding: 1.5rem;
+  box-shadow: var(--sr-shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.sr-feature-card:hover {
+  box-shadow: var(--sr-shadow-md);
+  border-color: #cbd5e1;
+}
+
+.sr-feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background-color: rgba(13, 59, 68, 0.08);
+  color: var(--sr-dark-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+/* Footer */
+footer {
+  background-color: #072228;
+  color: rgba(255, 255, 255, 0.8);
+}
